@@ -1,0 +1,7 @@
+Bien que cette indépendance offre une grande flexibilité, elle est aussi la source de la majorité des problèmes introduits par la programmation concurrente. Par exemple, que se passerait-il si, étant donné une donnée accessible par plusieurs tâches, une des tâches accédait à cette donnée alors qu’une autre tâche est en train de la modifier ? En général, on ne peut pas prévoir. Ce genre de chose s’appelle une data race (ou race condition) et est la source de l’écrasante majorité des bugs dans les programmes concurrents.
+
+Pour éviter ces problèmes, il existe plusieurs méthodes.
+
+    Synchroniser les accès aux données partagées. Il s’agit ici d’utiliser différents procédés (mutex, opérations atomiques, etc.) permettant d’éviter la modification d’une donnée en même temps que son accès par une autre tâche. Cette méthode est la plus courante dans les langages comme C et introduit une ribambelle de nouveaux problèmes complexes que nous ne détaillerons pas ici.
+    Interdire totalement les données mutables. Puisqu’une data race peut se produire uniquement lors de la modification d’une donnée, ne pas disposer du concept de modification règle le problème. C’est la méthode de choix dans les langages fonctionnels.
+    Interdire les données mutables partagées. Légère variante du point précédent, on est ici plus permissif sur les données locales à une tâche. Il s’agit de l’approche choisie par Pony.

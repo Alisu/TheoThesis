@@ -1,0 +1,37 @@
+Tiny benchmark
+VM without extra argument -O3
+846980976 bytecodes/sec; 49136604 sends/sec
+855472013 bytecodes/sec; 49416142 sends/sec
+863406408 bytecodes/sec; 49541404 sends/sec
+
+VM without extra argument -O2
+872975277 bytecodes/sec; 50241861 sends/sec
+854045037 bytecodes/sec; 50209593 sends/sec
+875962360 bytecodes/sec; 50306523 sends/sec
+
+VM without extra argument -O0
+350444900 bytecodes/sec; 10483247 sends/sec
+349011588 bytecodes/sec; 10368884 sends/sec
+348299319 bytecodes/sec; 10541379 sends/sec
+
+VM with extra arguments -O2 sqINT                                   struct foo *
+688172043 bytecodes/sec; 35344281 sends/sec                       784674329 bytecodes/sec; 41049815 sends/sec
+690492245 bytecodes/sec; 35578522 sends/sec                        "'822489959 bytecodes/sec; 40910781 sends/sec'"
+681757656 bytecodes/sec; 35164216 sends/sec                        "'821829855 bytecodes/sec; 40807122 sends/sec'"
+
+VM with extra arguments -O0 sqINT                                  struct foo *
+310868245 bytecodes/sec; 14588876 sends/sec                      "'333333333 bytecodes/sec; 15759973  sends/sec'"
+308062575 bytecodes/sec; 14635153 sends/sec                      "'331606217 bytecodes/sec; 15706322 sends/sec'"
+315659679 bytecodes/sec; 14752141 sends/sec                       329260450 bytecodes/sec; 15868382 sends/sec
+
+MT VM without extra arg -02
+109028960 bytecodes/sec; 4696305 sends/sec
+109401709 bytecodes/sec; 4724634 sends/sec
+115211521 bytecodes/sec; 4750104 sends/sec
+117323556 bytecodes/sec; 4908882 sends/sec
+
+
+MT VM without extra arg -O0
+80100125 bytecodes/sec; 3156968 sends/sec                
+84656084 bytecodes/sec; 3182335 sends/sec               
+83496412 bytecodes/sec; 3168448 sends/sec

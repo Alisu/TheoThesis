@@ -1,0 +1,355 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{Brief Article}
+\author{The Author}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Concurrency}
+Bien que cette indépendance offre une grande flexibilité, elle est aussi la source de la majorité des problèmes introduits par la programmation concurrente. Par exemple, que se passerait-il si, étant donné une donnée accessible par plusieurs tâches, une des tâches accédait à cette donnée alors qu’une autre tâche est en train de la modifier ? En général, on ne peut pas prévoir. Ce genre de chose s’appelle une data race (ou race condition) et est la source de l’écrasante majorité des bugs dans les programmes concurrents.
+
+Pour éviter ces problèmes, il existe plusieurs méthodes.
+
+    Synchroniser les accès aux données partagées. Il s’agit ici d’utiliser différents procédés (mutex, opérations atomiques, etc.) permettant d’éviter la modification d’une donnée en même temps que son accès par une autre tâche. Cette méthode est la plus courante dans les langages comme C et introduit une ribambelle de nouveaux problèmes complexes que nous ne détaillerons pas ici.
+    Interdire totalement les données mutables. Puisqu’une data race peut se produire uniquement lors de la modification d’une donnée, ne pas disposer du concept de modification règle le problème. C’est la méthode de choix dans les langages fonctionnels.
+    Interdire les données mutables partagées. Légère variante du point précédent, on est ici plus permissif sur les données locales à une tâche. Il s’agit de l’approche choisie par Pony.
+
+\section{Pony}
+ Pony en quelques mots
+
+Si l’on devait résumer Pony en quelques caractéristiques, le langage serait à acteurs, orienté objet, capability secure, statiquement et fortement typé, avec quelques éléments fonctionnels. Si ces termes ne vous sont pas familiers, pas d’inquiétude, nous détaillerons par la suite. L’implémentation de référence du langage est compilée et fonctionne actuellement sur x86 et ARM (32 et 64 bits dans les deux cas).
+
+Le langage est le fruit du projet de doctorat de Sylvan Clebsch. Il a commencé à travailler sur les concepts derrière Pony en 2011 et le langage est open-source depuis 2015. C’est donc un langage très jeune, mais issu de récents travaux de recherche académique. Les plus grandes inspirations de Pony ont été les travaux sur les acteurs (par Carl Hewitt à l’origine1 et étendus par Gul Agha2) et sur la sécurité basée sur les capabilities (formalisée par Mark Miller3). La thèse de S. Clebsch, bien qu’actuellement non finalisée, est disponible sur Github.
+
+La philosophie Pony est « get stuff done », que l’on pourrait approximer par « faire et achever des choses ». Le langage est un outil pour résoudre des problèmes spécifiques. En particulier, l’un des problèmes visés par Pony est « comment construire un modèle de concurrence sûr et performant ? » Les armes de Pony pour répondre à ce problème sont séparées principalement en deux champs.
+Un système de types puissant
+
+Pony dispose d’un système de types offrant un certain nombre de garanties. En particulier :
+
+    Le typage est statique. Autrement dit, le compilateur connaît le type de chaque objet à chaque instant du programme. Cela permet des vérifications de types très poussées à la compilation ;
+    Le typage est fort. La conversion entre types se fait toujours de manière explicite et les opérations classiques (arithmétique, concaténation de chaînes de caractère, etc) se font généralement sur des objets de même type, afin de réduire les erreurs d’inattention. De plus, il est impossible de contourner les garanties proposées. En particulier, le forgeage de référence est interdit. Si un objet est accessible dans une fonction, il y a été créé ou a été passé en paramètre. Ce dernier point participe à l’aspect capability secure du langage, terme sur lequel nous reviendrons ;
+    Pas de data races, avec une vérification complète à la compilation via une partie du système de types nommée reference capabilities. Il s’agit également d’une propriété associée à la capability security de Pony ;
+    Pas de pointeurs invalides, de dépassements de tampon, etc. Le pointeur nul n’existe pas et un programme ne plante jamais, sauf dans les cas extrêmes d’épuisement de la mémoire disponible ;
+    Toutes les exceptions doivent obligatoirement être traitées.
+
+Ce système de types est également très expressif, avec notamment la présence de sous-typage structural, de types algébriques et de types génériques. Nous détaillerons tout cela par la suite.
+
+\subsection{Note}
+
+Il n’existe pas de terme courant pour la distinction modèle/instance (à la manière de classe/objet) pour les acteurs, et « acteur » peut désigner un modèle ou une instance. Vous verrez parfois le terme « objet actif » pour une instance d’acteur et « objet passif » pour une instance de classe.
+
+\section{Type}
+ Et pour quelques types de plus
+
+Le système de types de Pony est très riche. Cette section présente les principales catégories de types et des exemples de cas d’utilisation.
+Classes
+
+En plus des acteurs, Pony dispose de classes, celles-ci étant introduites sans surprise par le mot-clé class.
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+
+	
+
+class Counter
+  var _count: U64
+  let step: U64
+
+  new create(init: U64, step': U64) =>
+    _count = init
+    step = step'
+
+  fun value(): U64 =>
+    _count
+
+  fun ref increment() =>
+    _count = _count + step
+
+La seule différence entre acteurs et classes et que ces dernières ne peuvent pas disposer de behaviour, mais uniquement de fonctions synchrones. On utilisera une classe plutôt qu’un acteur pour représenter une donnée « passive », qui ne peut pas recevoir de messages.
+
+Dans cette classe Counter, nous commençons par déclarer deux champs, _count et step. Si un champ débute par un tiret-bas, il est privé, dans le cas contraire il est publique. Un champ (ou une variable locale de fonction) déclaré var est ré-assignable tandis qu’un champ déclaré let ne l’est pas.
+
+Un constructeur, introduit par new, nommé create ici, initialise simplement les champs. Tous les champs d’un objet doivent être initialisés dans le constructeur, ou le programme ne compilera pas. Une classe ou un acteur peut avoir plusieurs constructeurs, dont les noms sont libres.
+
+Une fonction introduite par fun, comme value, est une fonction classique, synchrone. Les acteurs peuvent aussi disposer de fonctions. Détail syntaxique, la valeur de retour d’une fonction est la dernière expression de son corps.
+
+La déclaration de la fonction increment contient un ref. Pour simplifier, cela signifie que la fonction souhaite modifier son receveur, et que celui-ci doit donc être mutable dans la fonction appelante (par défaut, une fonction ne peut pas modifier son receveur). En réalité, ref est une reference capability et a des implications complexes sur lesquelles nous reviendrons.
+
+Il n’est pas possible d’hériter d’une autre classe, Pony préférant la composition à l’héritage. Pour compenser, il existe un système d’interfaces et de traits, dont nous allons parler dans quelques instants.
+Primitives
+
+Il existe un troisième membre dans le club des types de base de Pony, la primitive, introduite par le mot-clé primitive. Une primitive peut disposer de fonctions, mais pas de champs. De plus, il n’existe qu’une instance de chaque primitive. Cela signifie que le constructeur d’une primitive donnée renverra toujours la même référence. Les primitives ont plusieurs utilités.
+
+    Une valeur singleton. Par exemple, la bibliothèque standard contient la primitive None, utilisée pour les objets « sans valeur » ;
+    Une énumération, en formant une union de plusieurs primitives. Nous présenterons les unions par la suite ;
+    Une collection de fonctions. Les fonctions globales n’existent pas en Pony. Une primitive peut être utilisée pour regrouper des fonctions sur le même thème.
+
+Interfaces et traits
+
+Les interfaces et les traits sont très similaires, ils permettent de définir une liste de fonctions dont un type doit disposer pour implémenter l’interface ou le trait.
+
+1
+2
+3
+4
+5
+
+	
+
+interface Stringable
+  fun string(): String
+
+trait Adder
+  fun ref add(n: U64)
+
+Une interface introduit une relation de sous-typage structurel. Tout type, passé, présent ou futur, qui dispose d’une fonction fun string(): String est Stringable.
+
+Le sous-typage introduit par un trait est nominal. Un type doit explicitement spécifier qu’il est un Adder, même si il dispose d’une fonction fun ref add(n: U64).
+
+1
+2
+3
+4
+5
+
+	
+
+class A is Adder
+  fun ref add(n: U64)
+
+class B
+  fun ref add(n: U64)
+
+Ici, A est un Adder, ce qui n’est pas le cas de B.
+
+Le choix entre un trait et une interface dépend de ce que l’on souhaite faire du type. Un trait empêche l’inclusion accidentelle de types et permet donc de contrôler toutes les relations de sous-typage si l’on a besoin de cette sûreté. À l’inverse, une interface est beaucoup plus flexible et peut par exemple être utilisée avec un type défini dans une bibliothèque externe.
+\section{Capabilities}
+ Reference capabilities, vous dites ?
+
+Avant de parler reference capabilities, parlons simplement capabilities.
+
+Dans la sécurité basée sur les capabilities, une capability est un élément non-forgeable qui associe une référence vers une entité à l’ensemble des opérations autorisées sur l’entité à travers la référence. Cela permet de limiter l’autorité ambiante d’une référence (les actions possibles avec une autorisation implicite) et d’expliciter les droits dont dispose cette référence. Autrement dit, pour pouvoir effectuer une action, un élément d’un système doit en avoir obtenu l’autorisation d’un autre élément ayant lui même le droit d’effectuer l’action. Ce concept a été utilisé au départ dans les systèmes d’exploitation ; par exemple un descripteur de fichier est une référence associant un fichier à un ensemble de droits d’accès, droits cédés ou non en fonction de l’identité de l’utilisateur.
+
+On retrouve ce concept, souvent inconsciemment, dans la plupart des langages de programmation. En effet, un objet typé est une capability qui associe un emplacement en mémoire à un ensemble de fonctions appelables sur l’objet. On parle d’object capability, concept que le langage E a été le premier à définir formellement. Un langage (ou un système en général) est dit capability secure si les règles des capabilities sont incontournables. Par exemple, le C n’est pas capability secure car on peut forger des références via le transtypage de pointeurs.
+Pony fait partie des langages capability secure, à la fois dans ses object capabilities et dans ses reference capabilities, dont nous allons parler immédiatement.
+
+La littérature francophone sur les capabilities étant très réduite, il n’existe pas de traduction standard pour le vocabulaire du domaine.
+Les reference capabilities à proprement parler
+
+Les reference capabilities de Pony sont des capabilities qui permettent de prouver l’absence de data races à la compilation. Ce sont des annotations de type (à la manière de const en C++) ; et elles sont au nombre de six : iso, trn, ref, val, box et tag.
+
+    Une référence iso, trn ou ref est mutable, elle permet de lire, écrire et de connaître l’identité de l’objet associé (opérateur is) ;
+    Une référence val ou box est immutable, elle permet de lire et de connaître l’identité de l’objet associé ;
+    Une référence tag est opaque, elle permet uniquement de connaître l’identité de l’objet associé.
+
+Ces propriétés sont déjà intéressantes, mais la force des reference capabilities vient de ce qu’elles interdisent plutôt que de ce qu’elles autorisent aux alias d’une référence. Deux références sont des alias si elles ont la même identité (si elles désignent le même objet). Du point de vue d’une référence donnée, un alias est local si il se trouve dans le même acteur, et distant si il se trouve dans un autre acteur. Pour chaque reference capability, on introduit des règles sur les types d’alias qui ne peuvent pas exister. En terme de capabilities, une reference capability associe une référence vers un objet à l’ensemble des alias interdits pour cette référence. Pour nos reference capabilities et avec une référence R se trouvant dans un acteur quelconque :
+
+    Si R est une référence iso, aucun alias en lecture ou en écriture ne peut exister, local ou distant. Un objet référencé par une référence iso est profondément isolé, aucun objet en dehors de la « bulle » composée de l’iso et de ses sous-objets ne peut accéder à quelque chose dans la « bulle », et vice-versa ;
+    Si R est une référence trn, les alias distants en lecture et en écriture ainsi que les alias locaux en écriture ne peuvent pas exister. On peut utiliser trn pour construire une structure de données au fur et à mesure, puis « abaisser » la référence en une référence immutable. Cela permet notamment la création de structures de données cycliques immutables ;
+    Si R est une référence ref, les alias distants en lecture et en écriture ne peuvent pas exister. ref est le plus proche d’une référence dans un langage orienté objet classique comme Java et peut être aliasé très librement dans l’acteur courant ;
+    Si R est une référence val, les alias locaux ou distants en écriture ne peuvent pas exister. Là où iso est profondément isolé, val est profondément immutable : l’objet et ses sous-objets sont constants. De plus, cette immutabilité est irréversible, un objet val (ou un de ses sous-objets) ne deviendra jamais mutable.
+    Si R est une référence box, les alias distants en écriture ne peuvent pas exister. box représente l’immutabilité locale. La mutabilité réelle de l’objet importe peu, une référence box a uniquement besoin de lire. C’est un peu comme const en C++.
+    Si R est une référence tag, aucun type d’alias n’est interdit. tag transporte simplement l’information sur l’identité d’un objet. Toutes les reference capabilities peuvent avoir un alias tag.
+
+Et en image, la matrice d’interdictions :
+	
+
+alias globaux
+
+lect. et ecr. interdites
+	
+
+ecr. interdite
+	
+
+rien d’interdit
+
+alias locaux
+	
+
+lect. et ecr. interdites
+	
+
+iso
+	
+
+S/O
+	
+
+S/O
+
+ecr. interdite
+	
+
+trn
+	
+
+val
+	
+
+S/O
+
+rien d’interdit
+	
+
+ref
+	
+
+box
+	
+
+tag
+	
+
+référence mutable
+	
+
+référence immutable
+	
+
+référence opaque
+
+Si tout cela n’est pas clair, le tableau suivant résume les différentes propriétés en terme d’alias autorisés plutôt qu’interdits.
+
+référence
+	
+
+alias local
+	
+
+alias global
+	
+
+alias tag
+	
+
+lecture
+	
+
+écriture
+	
+
+lecture
+	
+
+écriture
+	
+
+iso
+					
+
+✓
+
+trn
+	
+
+✓
+				
+
+✓
+
+ref
+	
+
+✓
+	
+
+✓
+			
+
+✓
+
+val
+	
+
+✓
+		
+
+✓
+		
+
+✓
+
+box
+	
+
+✓
+	
+
+✓
+	
+
+ou
+	
+
+✓
+		
+
+✓
+
+tag
+	
+
+✓
+	
+
+✓
+	
+
+✓
+	
+
+✓
+	
+
+✓
+
+À travers cela, deux propriétés générales se dessinent.
+
+    Si un acteur dispose d’une référence en lecture sur un objet, aucun autre acteur ne peut disposer d’une référence en écriture ;
+    Si un acteur dispose d’une référence en écriture sur un objet, aucun autre acteur ne peut disposer d’une référence en lecture.
+
+Et voilà, ces propriétés, combinées au fonctionnement des acteurs, sont suffisantes pour s’assurer l’absence de data races grâce au système de types.
+
+Afin de maintenir les garanties des reference capabilities, le langage impose des restrictions sur les types de références transmissibles entre acteurs (c’est à dire passables en paramètre de behaviour).
+
+    tag n’offre aucun accès en lecture ou en écriture. La transmission de tag est donc possible ;
+    val offre un accès en lecture et garantit qu’aucun accès en écriture n’existe dans le programme. La transmission de val est possible ;
+    iso offre un accès en lecture et en écriture et garantit qu’aucun autre accès n’existe dans le programme. À condition que l’émetteur ne conserve pas de référence, la transmission d’iso est possible. Détruire une référence est possible grâce à un élément du langage nommé lecture destructive.
+
+Plus généralement, il s’agit des reference capabilities qui interdisent la même chose aux alias locaux et aux alias globaux (la diagonale dans la matrice d’interdictions). En effet, dans ces cas là, l’acteur qui possède la référence n’entre pas en ligne de compte.
+
+Il est donc possible de transmettre des données mutables, immutables ou opaques et ce sans aucune copie, ce qui est très important pour les performances. Les reference capabilities n’ont aucun surcoût à l’exécution, toutes les vérifications nécessaires étant réalisées à la compilation.
+
+Pour faire un détour par les fonctions, le ref de fun ref est la reference capability ref. Cette annotation sur une fonction signifie donc en réalité que l’objet receveur de la fonction (this) doit être d’un type compatible avec ref lors de l’appel.
+
+Concernant les acteurs, puisqu’un acteur ne peut pas examiner l’état des autres acteurs mais doit pouvoir examiner son propre état, un acteur voit tous les autres acteurs en tant que tag et se voit lui-même en tant que ref (this est ref dans un behaviour). Contrairement à d’autres langages à acteurs, les acteurs sont donc entièrement intégrés dans le système de types en Pony.
+
+Si vous êtes intéressés par les aspects formels des reference capabilities, vous pouvez vous diriger vers le papier à ce sujet.
+
+
+\end{document}  
