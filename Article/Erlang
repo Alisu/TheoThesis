@@ -1,0 +1,52 @@
+ Erlang:
+Erlang is a functionnal langage with ability to handle concurrency and distributed programming.
+The starter guide talks about function and modules. Modules are the closest entities to classes in the fact they encapsulate some attributes and some functions.
+In Erlang, each thread of execution is called a process. They are not called thread because they don't share data with each other (no race conditions).
+The Erlang BIF spawn is used to create a new process: spawn(Module, Exported_Function, List of Arguments). It returns the procces ID have the spawned process.
+Message passing example between 2 process: (took from the guide)
+
+-module(tut15).
+
+-export([start/0, ping/2, pong/0]).
+
+ping(0, Pong_PID) ->
+    Pong_PID ! finished,
+    io:format("ping finished~n", []);
+
+ping(N, Pong_PID) ->
+    Pong_PID ! {ping, self()},
+    receive
+        pong ->
+            io:format("Ping received pong~n", [])
+    end,
+    ping(N - 1, Pong_PID).
+
+pong() ->
+    receive
+        finished ->
+            io:format("Pong finished~n", []);
+        {ping, Ping_PID} ->
+            io:format("Pong received ping~n", []),
+            Ping_PID ! pong,
+            pong()
+    end.
+
+start() ->
+    Pong_PID = spawn(tut15, pong, []),
+    spawn(tut15, ping, [3, Pong_PID]).
+
+Basically, they use an actor model for communication.
+The ! construct is ised to send messages.
+The receive ... end construct is used to allow processes to wait for messages from other processes.
+Each process has its own input queue for messages it receives. New messages received are put at the end of the queue. 
+When a process executes a receive, the first message in the queue is matched against the first pattern in the receive.
+If this matches, the message is removed from the queue and the actions corresponding to the pattern are executed.
+In the example, calling the process with pong 'Pong' and the process with ping 'Ping':
+1: Ping sends a tuple {ping, self()}
+2: {ping, self()} is put at the end of the input queue of Pong (the first element here)
+3: Pong execute a receive and try to match pattern (here finished is a  o match then {ping, Ping_PID} is a match)
+4: {ping, self()} is remove from the queue
+5: Pong print and send a message to Pong
+6: repeat
+
+You can register to process in order to identify them and send them messages.

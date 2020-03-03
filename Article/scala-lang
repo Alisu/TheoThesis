@@ -1,0 +1,19 @@
+ From: https://www.scala-lang.org/
+
+"Scala combines object-oriented and functional programming in one concise, high-level language. Scala's static types help avoid bugs in complex applications, and its JVM and JavaScript runtimes let you build high-performance systems with easy access to huge ecosystems of libraries".
+
+For concurrency Scala uses Future  (https://www.scala-lang.org/api/current/scala/concurrent/Future$.html) and promise (https://www.scala-lang.org/api/current/scala/concurrent/Promise.html).
+
+
+They define a future as: “A Future represents a value which may or may not currently be available, but will be available at some point, or an exception if that value could not be made available.”
+With https://docs.scala-lang.org/overviews/scala-book/futures.html you can construct a future like follow:
+
+scala> val b = a.map(_ * 2)
+b: scala.concurrent.Future[Int] = Future(<not completed>)
+
+The not completed is then Succes(84). To create a method that runs as a Future: Just pass a block of code into the Future constructor to create the method body.
+
+A future returns an handle that can be used to register new callbacks (to post new things to do) when the future is completed, i.e., when the computation is finished. And since all this is executed asynchronously, without blocking, the main program
+ thread can continue doing other work in the meantime. 
+
+I don't really know what to add. Do we already have article on futures that i can read ? (Santi ?)

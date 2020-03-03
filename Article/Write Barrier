@@ -1,0 +1,22 @@
+ https://dl.acm.org/doi/10.1145/2991041.2991063
+I wanted to do something similar to this article in order to have a 'lock' for different threads writing in an object.
+Thanks Pierre for the article.
+
+The article talks about a write barrier per object in our VM with as little overhead as possible. The goal for the author is to have read-only objects. There is an extra check for every store into an object to see if the object is read-only (the barrier per se) in this case a callback is initiated to decide further action. Since there is extra instruction the author tires to minimize their impact.
+
+The solution was implemented in three steps:
+
+    Enhancing the memory representation of objects to be able to encode their read-only state. (bit in the header to mark isReadOnly)
+    Adding support in the execution engine to forbid read- only objects mutations.The objects are mutated in two main ways in the current virtual machine:
+    -> By storing into one of their instance variable field (byte-code instruction).
+    -> By performing a primitive operation that mutates object, such as at:put:.
+    This is were our check will be added.
+
+    Adding support in the Pharo image to be able to use the new feature. (image side api, editing fallback code)
+
+Note: some objects are hard or not meant to be read-only (Context instances, All objects related to process scheduling: the global variable Processor / the array of linked lists of processes (Processor instance variable) / ProcessLinkedList instances Process instances Semaphore instances, etc ...).
+
+In the implementation part, we learn that he has done it for the JIT and to optimize the check there is trampolines. (can detail more if wanted but don't think it's usefull).
+
+In the evaluation, he estimates that the code is 1.52% bigger and for Games benchmark it could not mesure an overhead (less than 1%).
+He then did an edge case scenario where the overhead is 18% but he did not know is this case is relevant. And that's it.

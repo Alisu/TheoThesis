@@ -1,0 +1,27 @@
+ Dynamically-typed languages are popular, but dynamic object models are often unsafe in multithreaded environments.
+The article present an enhance object model which is thread-safe. To quote the article: ' This is achieved by ensuring that field reads do not require synchronization and field updates only need to synchronize on objects shared between threads.'. Then they do a benchmark based on their own enhanced JRuby+Truffle.
+
+The intro explicit that a lot of energy have been put to improve the sequential performance of dynamically typed languages. One of them is the representation of objects in memory and those representations are unsafe to multithreading. To handle multithreading most solutions are archaic  like global locks or no shared data.
+There exist more elegant solutions but not garantying safety.
+
+After we have a quick reminder of object representations using maps which allow to have fixed field and thus quick access to the field. And a  quick reminder on truffle which i am not sure to understand.
+
+Then the article explains classical problems of threading but applying to object fields.
+1. Concurrent field definition aka 2 threads try to remove/add field to an object in the same time.
+2. Lost field updates aka 2 threads trying to read/write  or write/write a value in the same time in the same field.
+3. Out of thin air value aka read or write during remove/add field.
+
+To quote again:
+'To prevent these three types of problems, the object model needs to guarantee that, even in the presence of application-level data races:
+•any read of an existing object field returns only values that were previously assigned to that field,
+•any read to non-existing object fields triggers the correct semantics for handling an absent field such as returning a default value, like nil, or throwing an exception.
+•a write to an object field is immediately visible in the same thread. The visibility of the write in other threads can require application-level synchronization.'
+
+Their solutions:
+-separate Locations for Pairs of Field and Type which basically ensure non mismatch type and throw out of bound if we read a field that is not valid anymore.
+This way, they don't need to have synchronization for reads at this level.
+-Write-side Synchronization. 'All forms of updates are synchronized by locking the corresponding object for the duration of the update.' but only for object that are shared. They know if an object is shared depending on the shape of the object, the first time the object is shared he take a "shared shape object". Since they already have shape-check, it just another case of check (few overhead).
+
+Some of the choice they made are open to discussion like they show after that. (example: have a bit to tag a shared object)
+
+Finally before the article conclude, there is an evaluation on the performance of their model. They seem to have no overhead for the cases without shared objects and to pay a little overhead (3%) in the other cases. They seem to have a performance near to the 'unsafe' implementation and better than locking every objects.

@@ -1,0 +1,32 @@
+ From https://golang.org/doc/
+
+Go is expressive, concise, clean, and efficient. Its concurrency mechanisms make it easy to write programs that get the most out of multicore and networked machines, while its novel type system enables flexible and modular program construction. Go compiles quickly to machine code yet has the convenience of garbage collection and the power of run-time reflection. It's a fast, statically typed, compiled language that feels like a dynamically typed, interpreted language.
+
+Go use 'goroutines' for concurrency. A 'goroutine' seems to be a thread. Here an example of code:
+
+go func() {
+    time.Sleep(1 * time.Second)
+    timeout <- true
+}()
+
+the keyword go before the func means that this function will be done in a goroutine (not the main one).
+
+In order to communicate between goroutines, you use channels (https://golang.org/ref/spec#Channel_types).
+You can give:
+-the direction of the channel (only receive, only send, both)
+-the type of elements you will communicate
+-and the size of the buffer (number of elements)
+Examples:
+
+chan<- float64  // can only be used to send float64s
+<-chan int      // can only be used to receive ints
+
+To avoid data race, there seems to be an ownership system. Only the owner of the data can read and write on it. 
+When you send the data to another goroutine trough a channel the ownership is passed. 
+To cite them: 
+'Channels allow you to pass references to data structures between goroutines.
+you consider this as passing around ownership of the data (the ability to read and write it)' 
+and:
+'a Resource pointer on a channel passes ownership of the underlying data from the sender to the receiver.'
+
+​Here an example of a bigger example of communication https://golang.org/doc/codewalk/sharemem/:

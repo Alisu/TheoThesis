@@ -1,0 +1,51 @@
+ The paper aims to solve the issues of data sharing, revocation, thread control and resource control on the language side instead of the system. (balance between control/sharing)
+It presents a solution for Java by extending the type system. The idea is "share data using special remote pointers, which have different types from local pointers" and having what they call a tasks model.
+
+In the introduction is presented the deprecated API for Thread termination and the problem it had which are:
+-the wrong code get intreupted
+-malicious code can prevent rermination
+-malicious code can propagate
+-thread can get terminated while doing a read/write and corrupting an object
+-terminated code isn't reclaimed
+
+Then we have the solutions to this kind of problems for:
+-DrScheme which adopt parent-to-child pattern. The parent is reponsible to cleanly terminate the childs.
+-J-Kernel where you can share only special capabilities which are revocable. You can perform remote method invocations.
+-The Java Community Process which only allows sharing copies.
+-KaffeOS (i will do the report soon too) which only allows to cummunicate with objects that do not contains overideable methods (primitive types and byteArray for example).
+
+Finally we have the explanation about the remote pointers and the tasks model.
+
+In their approach, "a single virtual machine will contain many tasks, each with its own objects, threads, and code.
+Inter-task communication is organized around the concept of a revocable remote pointer which is built into Luna's type system. Pointers from one task to an object in another task have a special type indicated by a tilde (e.g. "String-", "Hashtable-")".
+The revocabilty allows clean termination. When a task is terminated all pointers are revoked  and deallocated.
+Remote pointers supports the same operation than local pointer but with a different semantic and an overhead.
+To handle the revocability you can use the Permit class. A remote pointer is a two words value composed of the pointer and a permit.
+"The @ operator converts a local pointer into a remote pointer:
+
+Permit p = new Permit();
+
+String s = "hello";
+
+String- sr - s @ p;"
+
+Operations on remote pointers perform a run- time access check if the pointer is not revoked.
+
+It's still the application's duty to decide what to do in case of one of its communication partners becomes unreachable.
+
+
+After that we have a view on how they implement their model.
+
+They optimize the access to the remote pointers such as cache very similar to TLB (Translation lookaside buffer).
+We also have a quick view on they modify the GC to take into account the remote pointers. (check if the permit is still valid).
+
+
+Follow by that we have benchmark on two application (extensible web serve, active cache) where they show they manage to reduce the overhead with the cache system varieting from 5 to 15% overhead.
+
+But array and field accesses were challenging to optimize, requiring extensive cooperation between the compiler and run-time system.
+
+
+To finish there is a new comparison to related works already evoked and the article conclude in a bitter way, saying the problem seemed easy at first but was not in fact.
+
+
+

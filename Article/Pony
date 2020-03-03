@@ -1,0 +1,29 @@
+ Pony:
+Pony is an open-source, object-oriented, actor-model based langage. It is also statically and strong typed.
+Pony introduces the notion of behaviour which is an asynchronous function.
+When a  behaviour is called he is not executed directly instead he is enqueued in the corresponding actor to be processed later .
+Pony diffentiates actors and classes by this fact, actors can have behaviour, classes can't.
+
+Some properties about actors and behaviours:
+
+    An actor can process only one behaviour at a time, the processing of messages is sequential.
+    An unknown number of behaviours can be process in the same isnatnt but by different actors ;
+    An actor can only access his own state, never the one of another actor
+    During his execution, a behaviour can't observe modification he did not do by himself.
+
+To deal with data race, Pony forbids mutable shared data. This is ensured trough type annotation.
+There is 6 of them: iso, trn, ref, val, box et tag.
+
+     iso, trn ou ref references are mutable, they allow read/write/know the identity of the associated object
+    val ou box references are immutable, they allowto read/know the identity of the associated object 
+    tag reference is opaque, you can only ask for the identity of the object.
+
+Two references are alias if they point to the same associated object. From a reference point of view, an alias is local is the other reference is in the same actor. Is is global if it is in a distant actor.
+For each annotation, they introduce rules about the type of aliases that can exist.
+Examples with a reference R:
+
+    If R is iso, the rule is: no aliases doing write or read can exist local or distant. Which means other aliases are annotated tag and you can only know the identity of the referenced object.
+    If R is trn, global aliases doing write or read and local aliases doing read can't exist. Which means only tag and box aliases are allowed
+    If R istag, all aliases are allowed.
+
+Put it in simple word, the type annotations ensure that you can't try to write at the same adresse through different aliases, for example.
