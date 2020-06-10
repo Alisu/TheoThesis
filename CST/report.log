@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.4.30)  5 JUN 2020 16:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.4.30)  10 JUN 2020 09:47
 entering extended mode
 **./report.tex
 (report.tex
@@ -366,31 +366,85 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 62.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 62.
- [1
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 87.
 
-{C:/Users/Alisu/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-Overfull \hbox (2.88586pt too wide) in paragraph at lines 108--112
+Overfull \hbox (73.02701pt too wide) in paragraph at lines 87--92
+[]$\OMS/cmsy/m/n/10.95  \OML/cmm/m/it/10.95 module\OT1/cmr/m/n/10.95 (\OML/cmm/
+m/it/10.95 tut\OT1/cmr/m/n/10.95 15)\OML/cmm/m/it/10.95 : \OMS/cmsy/m/n/10.95  
+ \OML/cmm/m/it/10.95 export\OT1/cmr/m/n/10.95 ([\OML/cmm/m/it/10.95 start=\OT1/
+cmr/m/n/10.95 0\OML/cmm/m/it/10.95 ; ping=\OT1/cmr/m/n/10.95 2\OML/cmm/m/it/10.
+95 ; pong=\OT1/cmr/m/n/10.95 0])\OML/cmm/m/it/10.95 :ping\OT1/cmr/m/n/10.95 (0\
+OML/cmm/m/it/10.95 ; Pong[]ID\OT1/cmr/m/n/10.95 )\OMS/cmsy/m/n/10.95   \OML/cmm
+/m/it/10.95 > Pong[]ID\OT1/cmr/m/n/10.95 !\OML/cmm/m/it/10.95 finished; io \OT1
+/cmr/m/n/10.95 :
+ []
+
+
+Overfull \hbox (154.03809pt too wide) in paragraph at lines 93--100
+[]$\OML/cmm/m/it/10.95 ping\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 N; Pong[]ID\
+OT1/cmr/m/n/10.95 )\OMS/cmsy/m/n/10.95   \OML/cmm/m/it/10.95 > Pong[]ID\OT1/cmr
+/m/n/10.95 ![]\OML/cmm/m/it/10.95 ; receivepong\OMS/cmsy/m/n/10.95   \OML/cmm/m
+/it/10.95 > io \OT1/cmr/m/n/10.95 : \OML/cmm/m/it/10.95 format\OT1/cmr/m/n/10.9
+5 ("\OML/cmm/m/it/10.95 Pingreceivedpong []n\OT1/cmr/m/n/10.95 "\OML/cmm/m/it/1
+0.95 ; \OT1/cmr/m/n/10.95 [])\OML/cmm/m/it/10.95 end; ping\OT1/cmr/m/n/10.95 (\
+OML/cmm/m/it/10.95 N \OMS/cmsy/m/n/10.95  
+ []
+
+
+Overfull \hbox (14.67804pt too wide) in paragraph at lines 101--110
+[]$\OML/cmm/m/it/10.95 pong\OT1/cmr/m/n/10.95 ()\OMS/cmsy/m/n/10.95   \OML/cmm/
+m/it/10.95 > receivefinished\OMS/cmsy/m/n/10.95   \OML/cmm/m/it/10.95 > io \OT1
+/cmr/m/n/10.95 : \OML/cmm/m/it/10.95 format\OT1/cmr/m/n/10.95 ("\OML/cmm/m/it/1
+0.95 Pongfinished []n\OT1/cmr/m/n/10.95 "\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.
+95 []); []\OMS/cmsy/m/n/10.95   \OML/cmm/m/it/10.95 >
+ []
+
+[1
+
+{C:/Users/Alisu/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] [2]
+Overfull \hbox (107.46565pt too wide) in paragraph at lines 198--199
+[]\OT1/cmr/m/n/10.95 For con-cur-rency Scala uses Fu-ture (https://www.scala-la
+ng.org/api/current/scala/concurrent/Future.html)
+ []
+
+
+Overfull \hbox (18.99611pt too wide) in paragraph at lines 204--206
+[]$\OML/cmm/m/it/10.95 scala > valb \OT1/cmr/m/n/10.95 = \OML/cmm/m/it/10.95 a:
+map\OT1/cmr/m/n/10.95 ([]2)\OML/cmm/m/it/10.95 b \OT1/cmr/m/n/10.95 : \OML/cmm/
+m/it/10.95 scala:concurrent:Future\OT1/cmr/m/n/10.95 [\OML/cmm/m/it/10.95 Int\O
+T1/cmr/m/n/10.95 ] = \OML/cmm/m/it/10.95 Future\OT1/cmr/m/n/10.95 (\OML/cmm/m/i
+t/10.95 < notcompleted >
+ []
+
+[3] [4] [5] [6]
+Overfull \hbox (2.88586pt too wide) in paragraph at lines 324--328
 \OT1/cmr/m/n/10.95 in-ter-preters or an-other im-age. In our im-ple-men-ta-tion
 , a chan-nel is an atom-ic-SharedQueue
  []
 
-[2] [3] [4] (report.aux) ) 
+[7] [8] (report.aux) ) 
 Here is how much of TeX's memory you used:
- 4016 strings out of 492897
- 63593 string characters out of 3123754
+ 4019 strings out of 492897
+ 63647 string characters out of 3123754
  140590 words of memory out of 3000000
- 7887 multiletter control sequences out of 15000+200000
- 9089 words of font info for 32 fonts, out of 3000000 for 9000
+ 7890 multiletter control sequences out of 15000+200000
+ 9705 words of font info for 34 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 44i,10n,43p,1319b,187s stack positions out of 5000i,500n,10000p,200000b,50000s
-<D:/Users/Alisu/AppData/Local/Programs/MiKTeX 2.9/fon
-ts/type1/public/amsfonts/cm/cmr10.pfb><D:/Users/Alisu/AppData/Local/Programs/Mi
-KTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><D:/Users/Alisu/AppData/Local
-/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><D:/Users/Alisu/A
-ppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmss12.pfb>
-Output written on report.pdf (4 pages, 67717 bytes).
+ 44i,11n,43p,1319b,187s stack positions out of 5000i,500n,10000p,200000b,50000s
+<D:/Users/Alisu/AppData/Local/Programs/MiKTeX 2.9/fonts/t
+ype1/public/amsfonts/cm/cmmi10.pfb><D:/Users/Alisu/AppData/Local/Programs/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmmi8.pfb><D:/Users/Alisu/AppData/Local/Pr
+ograms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/Users/Alisu/AppD
+ata/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><D:/User
+s/Alisu/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.
+pfb><D:/Users/Alisu/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfon
+ts/cm/cmss12.pfb><D:/Users/Alisu/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb><D:/Users/Alisu/AppData/Local/Programs/MiKTeX 2.9
+/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on report.pdf (8 pages, 120236 bytes).
 PDF statistics:
- 31 PDF objects out of 1000 (max. 8388607)
+ 61 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
